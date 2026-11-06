@@ -137,3 +137,13 @@ Os testes de interface dependem da disponibilidade da aplicação e do navegador
 Os testes de API dependem da disponibilidade dos endpoints utilizados.
 
 Os relatórios de execução são gerados localmente na pasta results/.
+
+11. Vercionamento
+
+Para futuras auterações no repositorio utilizar esses comandos:
+
+git add .
+
+git commit -m "test: adiciona novos cenarios de teste"
+
+git push
