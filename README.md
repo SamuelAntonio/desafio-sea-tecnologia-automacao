@@ -33,11 +33,11 @@ git --version
 
 Clone o repositório:
 
-git clone URL_DO_REPOSITORIO
+git clone https://github.com/SamuelAntonio/desafio-sea-tecnologia-automacao
 
 Acesse a pasta do projeto:
 
-cd NOME_DO_REPOSITORIO
+cd automation/
 
 Caso tenha baixado o projeto em ZIP, extraia os arquivos e abra o terminal na pasta raiz.
 
