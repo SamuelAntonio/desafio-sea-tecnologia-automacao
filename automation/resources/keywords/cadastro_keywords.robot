@@ -1,4 +1,3 @@
-
 *** Settings ***
 Library    Browser
 Library    RequestsLibrary
@@ -15,9 +14,46 @@ Preparar Formulário de Cadastro
     Go To    ${URL_BASE}
     Clicar em Adicionar Funcionário
 
+Preparar Tela Inicial
+    Go To    ${URL_BASE}  
+    Wait For Elements State    css=.c-kGuehp    visible  #aguarda o container da listagem.
+    Wait For Function    () => document.querySelectorAll('.c-bXqUbA').length > 0  #aguarda até existir pelo menos um card de funcionário.
+
+Filtrar Funcionários Ativos
+    Click    text=Ver apenas ativos
+
+Limpar Filtros
+    Click    button.clear
+
+Obter Quantidade De Funcionarios Exibidos
+    ${quantidade}=    Get Element Count    css=.c-bXqUbA
+    Log To Console    Funcionários exibidos: ${quantidade}
+    RETURN    ${quantidade}
+
 Clicar em Adicionar Funcionário
     Get Text    text=Adicionar Funcionário
     Click    text=Adicionar Funcionário
+
+Definir Status Do Funcionario
+    [Arguments]    ${status}=Ativo
+
+    ${estado_atual}=    Get Attribute    css=button[role="switch"]    aria-checked
+
+    IF    '${status}' == 'Ativo' and '${estado_atual}' == 'false'
+        Click    css=button[role="switch"]
+    ELSE IF    '${status}' == 'Inativo' and '${estado_atual}' == 'true'
+        Click    css=button[role="switch"]
+    END
+
+    ${estado_final}=    Get Attribute    css=button[role="switch"]    aria-checked
+
+    IF    '${status}' == 'Ativo'
+        Should Be Equal    ${estado_final}    true
+    ELSE IF    '${status}' == 'Inativo'
+        Should Be Equal    ${estado_final}    false
+    ELSE
+        Fail    Status inválido: ${status}. Utilize Ativo ou Inativo.
+    END
 
 Validar Formulário de Cadastro
     Wait For Elements State
@@ -97,6 +133,7 @@ Preencher Dados Basicos Do Funcionario
     RETURN    ${cpf}
 
 Preparar Dados Para Cadastro Completo
+    Definir Status Do Funcionario    Ativo
     ${cpf}=    Preencher Dados Basicos Do Funcionario
     Selecionar Cargo
     Selecionar Atividade
@@ -105,10 +142,52 @@ Preparar Dados Para Cadastro Completo
     RETURN    ${cpf}
 
 Preparar Dados Para Cadastro Sem EPI
+    Definir Status Do Funcionario    Inativo
     ${cpf}=    Preencher Dados Basicos Do Funcionario
     Selecionar Cargo
     Marcar Checkbox Não Usa EPI
     RETURN    ${cpf}
+
+Preencher Dados Basicos Sem Nome
+    ${cpf}=    Gerar Cpf Valido
+    Log To Console    CPF utilizado no cadastro: ${cpf}
+    Fill Text    input[name="cpf"]    ${cpf}
+    Fill Text    input[name="birthDay"]    1995-05-15
+    Fill Text    input[name="rg"]    5555555
+    RETURN    ${cpf}
+
+Preencher Dados Para Cadastro Com CPF Existente
+    [Arguments]    ${cpf}
+    Fill Text    input[name="name"]    Funcionario QA Duplicado
+    Fill Text    input[name="cpf"]    ${cpf}
+    Fill Text    input[name="birthDay"]    1995-05-15
+    Fill Text    input[name="rg"]    7777777
+
+Validar Obrigatoriedade Do Nome
+    ${required}=    Get Property    input[name="name"]    required
+    Should Be True    ${required}
+
+    ${mensagem}=    Get Property    input[name="name"]    validationMessage
+    Should Not Be Empty    ${mensagem}
+
+Validar Duplicidade De CPF Na API
+    [Arguments]    ${cpf_teste}
+
+    ${funcionarios}=    Consultar Funcionários Na API
+    ${encontrados}=    Create List
+
+    FOR    ${registro}    IN    @{funcionarios}
+        ${state}=    Get From Dictionary    ${registro}    state
+        ${employee}=    Get From Dictionary    ${state}    employee
+        ${cpf_api}=    Get From Dictionary    ${employee}    cpf
+
+        IF    $cpf_api == $cpf_teste
+            Append To List    ${encontrados}    ${employee}
+        END
+    END
+
+    Length Should Be    ${encontrados}    2
+    Log To Console    CPF ${cpf_teste} encontrado em ${2} registros.
 
 Consultar Funcionários Na API
     Create Session    api    ${URL_BASE}
@@ -210,3 +289,14 @@ Validar Campo UsesEpi Na API
     Log To Console    Valor de usesEpi retornado pela API: ${employee}[usesEpi]
 
     Should Be True    ${employee}[usesEpi]
+
+Validar Funcionário Na Listagem
+    [Arguments]    ${cpf_teste}    ${nome_esperado}
+
+    ${cpf_formatado}=    Evaluate    '${cpf_teste}'[:3] + '.' + '${cpf_teste}'[3:6] + '.' + '${cpf_teste}'[6:9] + '-' + '${cpf_teste}'[9:]
+
+    ${card}=    Set Variable    css=.c-bXqUbA:has(.c-iYbcAK:text-is("${cpf_formatado}"))
+
+    Wait For Elements State    ${card}    visible
+    ${nome}=    Get Text    ${card} >> span
+    Should Be Equal    ${nome}    ${nome_esperado}

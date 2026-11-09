@@ -1,3 +1,4 @@
+
 *** Settings ***
 Library    RequestsLibrary
 Library    Collections
@@ -33,6 +34,7 @@ Validar Estrutura Do Funcionario
 
     Dictionary Should Contain Key    ${funcionario}    id
     Dictionary Should Contain Key    ${funcionario}    state
+    Dictionary Should Contain Key    ${funcionario}    createdAt
 
     ${state}=    Get From Dictionary    ${funcionario}    state
 
@@ -73,6 +75,28 @@ Cadastrar Funcionario
     ...    api
     ...    /employees
     ...    json=${payload}
+    ...    expected_status=${status_esperado}
+
+    RETURN    ${resposta}
+
+
+Atualizar Funcionario
+    [Arguments]    ${id}    ${payload}    ${status_esperado}=200
+
+    ${resposta}=    PUT On Session
+    ...    api
+    ...    /employees/${id}
+    ...    json=${payload}
+    ...    expected_status=${status_esperado}
+
+    RETURN    ${resposta}
+
+Excluir Funcionario
+    [Arguments]    ${id}    ${status_esperado}=204
+
+    ${resposta}=    DELETE On Session
+    ...    api
+    ...    /employees/${id}
     ...    expected_status=${status_esperado}
 
     RETURN    ${resposta}
