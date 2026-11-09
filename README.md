@@ -95,6 +95,8 @@ Na raiz do projeto, execute todos os testes:
 
 robot -d results tests/
 
+python -m robot --dryrun -d results tests/
+
 Para executar um arquivo específico:
 
 robot -d results tests/nome_do_arquivo.robot

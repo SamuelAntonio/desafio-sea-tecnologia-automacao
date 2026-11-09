@@ -34,7 +34,9 @@ Validar Campos de EPI Visíveis
     Wait For Elements State    css=input[name="caNumber"]    visible
 
 Marcar Checkbox Não Usa EPI
-    Click    text=O trabalhador não usa EPI.
+    Click    css=label.ant-checkbox-wrapper
+    ${estado}=    Get Property    css=input.ant-checkbox-input    checked
+    Should Be True    ${estado}
 
 Validar Campos de EPI Ausentes
     ${quantidade_epi}=    Get Element Count    css=.epiSelect
@@ -64,16 +66,6 @@ Selecionar EPI
     ...    css=.epiSelect .ant-select-selection-item
     Should Be Equal    ${selecionado}    Óculos de proteção
 
-Preencher Dados Basicos Do Funcionario
-    Fill Text    input[name="name"]    Funcionario QA Automatizado
-    ${cpf}=    Gerar Cpf Valido
-    Log To Console    CPF utilizado no cadastro: ${cpf}
-    Fill Text    input[name="cpf"]    ${cpf}
-    Fill Text    input[name="birthDay"]    1995-05-15
-    Fill Text    input[name="rg"]    5555555
-    Fill Text    input[name="caNumber"]    1234
-    RETURN    ${cpf}
-
 Selecionar Cargo
     Click    css=.ant-select >> nth=0
     Click    text=Cargo 03
@@ -92,11 +84,30 @@ Selecionar Atividade
     Log To Console    Atividade após seleção: ${atividade}
     Should Be Equal    ${atividade}    Ativid 02
 
+Preencher Numero Do CA
+    Fill Text    input[name="caNumber"]    1234
+
+Preencher Dados Basicos Do Funcionario
+    Fill Text    input[name="name"]    Funcionario QA Automatizado
+    ${cpf}=    Gerar Cpf Valido
+    Log To Console    CPF utilizado no cadastro: ${cpf}
+    Fill Text    input[name="cpf"]    ${cpf}
+    Fill Text    input[name="birthDay"]    1995-05-15
+    Fill Text    input[name="rg"]    5555555
+    RETURN    ${cpf}
+
 Preparar Dados Para Cadastro Completo
     ${cpf}=    Preencher Dados Basicos Do Funcionario
     Selecionar Cargo
     Selecionar Atividade
     Selecionar EPI
+    Preencher Numero Do CA
+    RETURN    ${cpf}
+
+Preparar Dados Para Cadastro Sem EPI
+    ${cpf}=    Preencher Dados Basicos Do Funcionario
+    Selecionar Cargo
+    Marcar Checkbox Não Usa EPI
     RETURN    ${cpf}
 
 Consultar Funcionários Na API
@@ -132,3 +143,70 @@ Validar Funcionário Na API
     Should Be Equal    ${employee}[role]    Cargo 03
     Should Be Equal    ${employee}[activity]    Ativid 02
     Should Be Equal    ${employee}[caNumber]    1234
+
+Localizar Funcionario Na API 
+    [Arguments]    ${cpf_teste}
+
+    ${funcionarios}=    Consultar Funcionários Na API
+    ${encontrados}=    Create List
+
+    FOR    ${registro}    IN    @{funcionarios}
+        ${state}=    Get From Dictionary    ${registro}    state
+        ${employee}=    Get From Dictionary    ${state}    employee
+        ${cpf_api}=    Get From Dictionary    ${employee}    cpf
+
+        IF    $cpf_api == $cpf_teste
+            Append To List    ${encontrados}    ${employee}
+        END
+    END
+
+    Should Not Be Empty    ${encontrados}
+    Length Should Be    ${encontrados}    1
+
+    ${funcionario}=    Get From List    ${encontrados}    0
+    RETURN    ${funcionario}
+
+Validar Dados Basicos Do Funcionario Na API
+    [Arguments]    ${employee}
+
+    Should Be Equal    ${employee}[name]    Funcionario QA Automatizado
+    Should Be Equal    ${employee}[role]    Cargo 03
+
+Validar Funcionário Sem EPI Na API
+    [Arguments]    ${cpf_teste}
+
+    ${employee}=    Localizar Funcionario Na API    ${cpf_teste}
+    Validar Dados Basicos Do Funcionario Na API    ${employee}
+
+    ${epi}=    Get From Dictionary    ${employee}    epi    ${None}
+    ${ca}=    Get From Dictionary    ${employee}    caNumber    ${None}
+
+    Should Be True    $epi is None or $epi == ''
+    Should Be True    $ca is None or $ca == ''
+
+
+Validar Funcionário Com EPI Na API 
+    [Arguments]    ${cpf_teste}
+
+    ${employee}=    Localizar Funcionario Na API    ${cpf_teste}
+    Validar Dados Basicos Do Funcionario Na API    ${employee}
+
+    Should Be Equal    ${employee}[activity]    Ativid 02
+
+    ${epi}=    Get From Dictionary    ${employee}    epi
+    ${ca}=    Get From Dictionary    ${employee}    caNumber
+
+    Should Not Be Empty    ${epi}
+    Should Be Equal    ${ca}    1234
+
+Validar Opção Utiliza EPI Selecionada
+    ${estado}=    Get Property    css=input.ant-checkbox-input    checked
+    Should Be Equal    ${estado}    ${False}
+
+Validar Campo UsesEpi Na API
+    [Arguments]    ${cpf_teste}
+    ${employee}=    Localizar Funcionario Na API    ${cpf_teste}
+
+    Log To Console    Valor de usesEpi retornado pela API: ${employee}[usesEpi]
+
+    Should Be True    ${employee}[usesEpi]
