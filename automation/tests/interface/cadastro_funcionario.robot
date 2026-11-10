@@ -1,7 +1,6 @@
 
 *** Settings ***
 Resource    ../resources/keywords/cadastro_keywords.robot
-
 Suite Setup       Abrir Página de Cadastro
 Test Setup        Preparar Formulário de Cadastro
 Suite Teardown    Close Browser
@@ -41,13 +40,9 @@ CT-004 - Validar Campo UsesEpi Para Funcionário Que Utiliza EPI
 CT-006 - Filtrar Somente Funcionários Ativos
     [Documentation]    Valida se o filtro apresenta somente os funcionários ativos.
     [Setup]    Preparar Tela Inicial
-
     ${quantidade_inicial}=    Obter Quantidade De Funcionarios Exibidos
-
     Filtrar Funcionários Ativos
-
     ${quantidade_filtrada}=    Obter Quantidade De Funcionarios Exibidos
-
     Should Be True
     ...    ${quantidade_filtrada} < ${quantidade_inicial}
     ...    O filtro não reduziu a quantidade de funcionários exibidos.
@@ -56,15 +51,10 @@ CT-006 - Filtrar Somente Funcionários Ativos
 CT-007 - Limpar Filtro de Funcionários Ativos
     [Documentation]    Valida se a limpeza do filtro restaura a listagem completa.
     [Setup]    Preparar Tela Inicial
-
     ${quantidade_inicial}=    Obter Quantidade De Funcionarios Exibidos
-
     Filtrar Funcionários Ativos
-
     Limpar Filtros
-
     ${quantidade_final}=    Obter Quantidade De Funcionarios Exibidos
-
     Should Be Equal As Integers
     ...    ${quantidade_final}
     ...    ${quantidade_inicial}
@@ -91,10 +81,8 @@ CT-014 - Tentar Cadastrar Funcionário Com EPI Sem Informar CA
 
 CT-027 - Cadastrar Funcionário Com CPF Duplicado
     [Documentation]    Reproduz o BUG-001: aplicação permite CPF duplicado.
-
     ${cpf}=    Preparar Dados Para Cadastro Completo
     Tentar Salvar Cadastro
-
     Clicar em Adicionar Funcionário
     Preencher Dados Para Cadastro Com CPF Existente    ${cpf}
     Selecionar Cargo
@@ -102,7 +90,6 @@ CT-027 - Cadastrar Funcionário Com CPF Duplicado
     Selecionar EPI
     Preencher Numero Do CA
     Tentar Salvar Cadastro
-
     Validar Duplicidade De CPF Na API    ${cpf}
 
 CT-028 - Consultar Funcionário Após Cadastro
