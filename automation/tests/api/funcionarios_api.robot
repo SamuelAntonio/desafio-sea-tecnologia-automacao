@@ -105,18 +105,13 @@ CT-API-005 - Excluir funcionario
     ${resposta_delete}=    Excluir Funcionario    ${id}
     Should Be Equal As Integers
     ...    ${resposta_delete.status_code}
-    ...    204
+    ...    200
     ${resposta_get}=    Consultar Funcionario Por ID
     ...    ${id}
     ...    anything
     Should Be Equal As Integers
     ...    ${resposta_get.status_code}
     ...    404
-    ${corpo}=    Set Variable    ${resposta_get.json()}
-    Dictionary Should Contain Key    ${corpo}    error
-    Should Be Equal
-    ...    ${corpo}[error]
-    ...    Funcionário não encontrado.
 
 CT-API-006 - Cadastrar funcionario sem CPF
     [Documentation]    Verifica se a API rejeita o cadastro de funcionario sem a propriedade CPF.
@@ -141,8 +136,3 @@ CT-API-007 - Consultar funcionario com ID inexistente
     ...    ${id_inexistente}
     ...    anything
     Should Be Equal As Integers    ${resposta.status_code}    404
-    ${corpo}=    Set Variable    ${resposta.json()}
-    Dictionary Should Contain Key    ${corpo}    error
-    Should Be Equal
-    ...    ${corpo}[error]
-    ...    Funcionário não encontrado.

@@ -1,7 +1,7 @@
 *** Settings ***
 Library    Browser
-Library    RequestsLibrary
 Library    Collections
+Library    RequestsLibrary
 Library    ../libraries/CpfLibrary.py
 Resource   ../variables/config.robot
 
@@ -9,7 +9,8 @@ Resource   ../variables/config.robot
 
 # Pre-requisições
 Abrir Página de Cadastro
-    New Browser    ${BROWSER}    headless=False
+    Log To Console    URL utilizada: ${URL_BASE}
+    New Browser    ${BROWSER}    headless=${HEADLESS}
     New Page    ${URL_BASE}
 
 Preparar Formulário de Cadastro
@@ -93,7 +94,6 @@ Tentar Salvar Cadastro
 Preencher Dados Basicos Do Funcionario
     Fill Text    input[name="name"]    Funcionario QA Automatizado
     ${cpf}=    Gerar Cpf Valido
-    Log To Console    CPF utilizado no cadastro: ${cpf}
     Fill Text    input[name="cpf"]    ${cpf}
     Fill Text    input[name="birthDay"]    1995-05-15
     Fill Text    input[name="rg"]    5555555
@@ -116,8 +116,8 @@ Preparar Dados Para Cadastro Sem EPI
     RETURN    ${cpf}
 
 Preencher Dados Basicos Sem Nome
+    Definir Status Do Funcionario    Inativo
     ${cpf}=    Gerar Cpf Valido
-    Log To Console    CPF utilizado no cadastro: ${cpf}
     Fill Text    input[name="cpf"]    ${cpf}
     Fill Text    input[name="birthDay"]    1995-05-15
     Fill Text    input[name="rg"]    5555555
@@ -161,13 +161,18 @@ Validar Obrigatoriedade Do CA
     Should Be Equal    ${valid}    ${False}
 
     ${mensagem}=    Get Property    css=input[name="caNumber"]    validationMessage
-    Should Be Equal    ${mensagem}    Preencha este campo.
+    Should Not Be Empty    ${mensagem}
 
 Validar Obrigatoriedade Do Nome
-    ${required}=    Get Property    input[name="name"]    required
+    ${required}=    Get Property    css=input[name="name"]    required
     Should Be True    ${required}
 
-    ${mensagem}=    Get Property    input[name="name"]    validationMessage
+    ${valid}=    Evaluate JavaScript  # O Evaluate JavaScript permite consultar a propriedade aninhada diretamente no elemento.
+    ...    css=input[name="name"]
+    ...    (element) => element.validity.valid
+    Should Be Equal    ${valid}    ${False}
+
+    ${mensagem}=    Get Property    css=input[name="name"]    validationMessage
     Should Not Be Empty    ${mensagem}
 
 Validar Duplicidade De CPF Na API

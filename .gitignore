@@ -1,6 +1,6 @@
 # Ambiente virtual
-.venv/
- venv/
+.venv_sea/
+venv_sea/
 
 # Python
 __pycache__/

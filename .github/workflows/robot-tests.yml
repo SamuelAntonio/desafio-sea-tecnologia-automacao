@@ -1,0 +1,54 @@
+
+name: Automação de Testes - Sea Tecnologia
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  robot-tests:
+    name: Executar testes Robot Framework
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: automation
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: pip
+          cache-dependency-path: automation/requirements.txt
+
+      - name: Instalar dependências Python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Instalar navegadores e dependências
+        run: rfbrowser init chromium
+
+      - name: Executar testes de API
+        run: python -m robot -d results/api tests/api/
+
+      - name: Executar testes de interface
+        if: ${{ !cancelled() }}
+        run: python -m robot --variable HEADLESS:True -d results/interface tests/interface/
+
+      - name: Publicar relatórios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios-robot-framework
+          path: automation/results/
+          if-no-files-found: warn

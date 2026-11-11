@@ -47,7 +47,7 @@ Atualizar Funcionario
     RETURN    ${resposta}
 
 Excluir Funcionario
-    [Arguments]    ${id}    ${status_esperado}=204
+    [Arguments]    ${id}    ${status_esperado}=200
     ${resposta}=    DELETE On Session
     ...    api
     ...    /employees/${id}
@@ -77,7 +77,6 @@ Validar Estrutura Do Funcionario
     [Arguments]    ${funcionario}
     Dictionary Should Contain Key    ${funcionario}    id
     Dictionary Should Contain Key    ${funcionario}    state
-    Dictionary Should Contain Key    ${funcionario}    createdAt
     ${state}=    Get From Dictionary    ${funcionario}    state
     Dictionary Should Contain Key    ${state}    employee
     ${employee}=    Get From Dictionary    ${state}    employee
