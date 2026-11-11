@@ -38,12 +38,12 @@ jobs:
       - name: Instalar navegadores e dependências
         run: rfbrowser init chromium
 
-      - name: Executar testes de API
-        run: python -m robot -d results/api tests/api/
-
       - name: Executar testes de interface
         if: ${{ !cancelled() }}
         run: python -m robot --variable HEADLESS:True -d results/interface tests/interface/
+
+      - name: Executar testes de API
+        run: python -m robot -d results/api tests/api/
 
       - name: Publicar relatórios
         if: always()
