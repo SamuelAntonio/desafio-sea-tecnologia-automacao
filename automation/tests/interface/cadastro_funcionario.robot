@@ -1,6 +1,6 @@
 
 *** Settings ***
-Resource    ../resources/keywords/cadastro_keywords.robot
+Resource    ../../resources/keywords/cadastro_keywords.robot
 Suite Setup       Abrir Página de Cadastro
 Test Setup        Preparar Formulário de Cadastro
 Suite Teardown    Close Browser
