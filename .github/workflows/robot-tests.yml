@@ -43,6 +43,7 @@ jobs:
         run: python -m robot --variable HEADLESS:True -d results/interface tests/interface/
 
       - name: Executar testes de API
+        if: ${{ !cancelled() }}
         run: python -m robot -d results/api tests/api/
 
       - name: Publicar relatórios
