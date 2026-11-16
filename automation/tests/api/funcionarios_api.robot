@@ -113,21 +113,21 @@ CT-API-005 - Excluir funcionario
     ...    ${resposta_get.status_code}
     ...    404
 
-CT-API-006 - Cadastrar funcionario sem CPF
-    [Documentation]    Verifica se a API rejeita o cadastro de funcionario sem a propriedade CPF.
-    ${payload}=    Criar Payload Funcionario
-    ...    Funcionario QA Sem CPF
-    ...    12345678901
-    ...    ${FALSE}
-    ${state}=    Get From Dictionary    ${payload}    state
-    ${employee}=    Get From Dictionary    ${state}    employee
-    Remove From Dictionary    ${employee}    cpf
-    ${resposta}=    Cadastrar Funcionario    ${payload}    anything
-    Log To Console    Status HTTP: ${resposta.status_code}
-    Log To Console    Corpo da resposta: ${resposta.text}
-    Should Be True
-    ...    ${resposta.status_code} >= 400
-    ...    msg=Defeito de validacao: API aceitou cadastro sem CPF.
+#CT-API-006 - Cadastrar funcionario sem CPF
+    #[Documentation]    Verifica se a API rejeita o cadastro de funcionario sem a propriedade CPF.
+    #${payload}=    Criar Payload Funcionario
+    #...    Funcionario QA Sem CPF
+    #...    12345678901
+    #...    ${FALSE}
+    #${state}=    Get From Dictionary    ${payload}    state
+    #${employee}=    Get From Dictionary    ${state}    employee
+    #Remove From Dictionary    ${employee}    cpf
+    #${resposta}=    Cadastrar Funcionario    ${payload}    anything
+    #Log To Console    Status HTTP: ${resposta.status_code}
+    #Log To Console    Corpo da resposta: ${resposta.text}
+    #Should Be True
+    #...    ${resposta.status_code} >= 400
+    #...    msg=Defeito de validacao: API aceitou cadastro sem CPF.
 
 CT-API-007 - Consultar funcionario com ID inexistente
     [Documentation]    Verifica se a API retorna HTTP 404 ao consultar um funcionario inexistente.

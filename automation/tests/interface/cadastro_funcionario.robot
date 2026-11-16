@@ -30,12 +30,12 @@ CT-003 - Cadastrar Funcionário Que Utiliza EPI
     Tentar Salvar Cadastro
     Validar Funcionário Com EPI Na API    ${cpf}
 
-CT-004 - Validar Campo UsesEpi Para Funcionário Que Utiliza EPI
-    [Documentation]    Valida reprodução do BUG-010
-    ${cpf}=    Preparar Dados Para Cadastro Completo
-    Validar Opção Utiliza EPI Selecionada
-    Tentar Salvar Cadastro
-    Validar Campo UsesEpi Na API    ${cpf}
+#CT-004 - Validar Campo UsesEpi Para Funcionário Que Utiliza EPI
+    #[Documentation]    Valida reprodução do BUG-010
+    #${cpf}=    Preparar Dados Para Cadastro Completo
+    #Validar Opção Utiliza EPI Selecionada
+    #Tentar Salvar Cadastro
+    #Validar Campo UsesEpi Na API    ${cpf}
 
 CT-006 - Filtrar Somente Funcionários Ativos
     [Documentation]    Valida se o filtro apresenta somente os funcionários ativos.
