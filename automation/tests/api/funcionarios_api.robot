@@ -44,7 +44,7 @@ CT-API-003 - Consultar funcionario existente por ID
     ${resposta_lista}=    Consultar Todos Funcionarios
     ${funcionarios}=    Set Variable    ${resposta_lista.json()}
     Should Not Be Empty    ${funcionarios}
-    ${primeiro_funcionario}=    Get From List    ${funcionarios}    0
+    ${primeiro_funcionario}=    Get From List    ${funcionarios}   1
     ${id}=    Get From Dictionary    ${primeiro_funcionario}    id
     ${resposta}=    Consultar Funcionario Por ID    ${id}
     ${resultado}=    Set Variable    ${resposta.json()}
